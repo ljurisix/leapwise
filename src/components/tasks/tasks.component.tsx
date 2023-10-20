@@ -1,21 +1,36 @@
 import { EditOutlined } from "@ant-design/icons";
 import { Button, Col, Row } from "antd";
-import { useState } from "react";
-import { CreateTaskModal } from "../modal";
+import { useEffect, useState } from "react";
+import { TaskInterface } from "../../common/interfaces";
+import { TaskFormModal } from "../modal";
 import CompletedTasks from "./completed/completed.component";
 import InProgressTasks from "./inProgress/inProgress.component";
 import TodoTasks from "./todo/todo.component";
 
-const todoList = [
-  { id: 1, title: "task 1", description: "desc", status: "todo" },
-  { id: 2, title: "task 2", description: "desc", status: "todo" },
-];
-
 export default function TasksComponent() {
   const [open, setOpen] = useState(false);
 
+  const [tasks, setTasks] = useState<Array<TaskInterface>>([]);
+  console.log(tasks);
+  useEffect(() => {
+    if (localStorage.getItem("localTasks")) {
+      const storedList = JSON.parse(
+        localStorage.getItem("localTasks") as string
+      );
+      setTasks(storedList);
+    }
+  }, []);
+
   const onCreate = (values: any) => {
     console.log("Received values of form: ", values);
+    console.log(tasks);
+    const newTask = {
+      id: new Date().getTime().toString(),
+      ...values,
+    };
+
+    setTasks([...tasks, newTask]);
+    localStorage.setItem("localTasks", JSON.stringify([...tasks, newTask]));
     setOpen(false);
   };
 
@@ -23,13 +38,19 @@ export default function TasksComponent() {
     <>
       <Row gutter={20} style={{ padding: "0 0 1em 0" }}>
         <Col span={8}>
-          <TodoTasks data={todoList} />
+          <TodoTasks data={tasks} setTasks={setTasks} />
         </Col>
         <Col span={8}>
-          <InProgressTasks data={[]} />
+          <InProgressTasks
+            data={tasks}
+            setTasks={setTasks}
+          />
         </Col>
         <Col span={8}>
-          <CompletedTasks data={[]} />
+          <CompletedTasks
+            data={tasks}
+            setTasks={setTasks}
+          />
         </Col>
       </Row>
       <Button
@@ -47,7 +68,7 @@ export default function TasksComponent() {
       >
         New task
       </Button>
-      <CreateTaskModal
+      <TaskFormModal
         open={open}
         onCreate={onCreate}
         onCancel={() => {

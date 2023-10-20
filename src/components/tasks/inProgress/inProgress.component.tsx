@@ -1,21 +1,48 @@
-import { List, Typography } from "antd";
+import { List, Space, Typography } from "antd";
+import { TaskInterface } from "../../../common/interfaces";
+import { TaskViewModal } from "../../modal";
+import { useState } from "react";
 
 interface Props {
-  data: Array<any>
+  data: Array<TaskInterface>;
+  setTasks: (task: any) => void;
 }
 
-export default function InProgressTasks({data} : Props) {
+export default function InProgressTasks({ data, setTasks }: Props) {
+  const [selectedTask, setSelectedTask] = useState<TaskInterface>();
+  const [open, setOpen] = useState(false);
+
   return (
     <>
-      <Typography.Title level={3}>In Progress</Typography.Title>
+      <Typography.Title level={3}>In progress</Typography.Title>
       <List
         bordered
-        dataSource={data}
-        renderItem={(item: any) => (
-          <List.Item>
-          <Typography.Text> {item} </Typography.Text>
-          </List.Item>
-        )}
+        dataSource={data?.filter((task) => task?.status === "inProgress")}
+        renderItem={(task: any, index) => {
+          return (
+            <List.Item key={index}>
+              <Space
+                onClick={() => {
+                  console.log(selectedTask);
+                  setOpen(true);
+                  setSelectedTask(task);
+                }}
+              >
+                <Typography.Text>{task.title}</Typography.Text>
+              </Space>
+            </List.Item>
+          );
+        }}
+      />
+
+      <TaskViewModal
+        open={open}
+        onCancel={() => {
+          setOpen(false);
+        }}
+        task={selectedTask as TaskInterface}
+        tasks={data}
+        setTasks={setTasks}
       />
     </>
   );
