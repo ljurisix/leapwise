@@ -2,7 +2,13 @@ import { DatePicker, Form, Input, Modal, Radio } from "antd";
 import { useState } from "react";
 import { TaskInterface } from "../../../common/interfaces";
 import dayjs from "dayjs";
+import { TaskStatusEnum } from "../../../common";
 
+/**
+ * Modal with form to create and edit tasks.
+ * Title, description && status are mandatory.
+ * If COMPLETE status is selected, duedate selection is disabled.
+ */
 interface Values {
   name: string;
   description: string;
@@ -38,6 +44,7 @@ export default function TaskFormModal({
     dueDate: dayjs(task?.dueDate),
   };
 
+  // check for task existence; open edit or create modal
   return onCreate ? (
     <Modal
       open={open}
@@ -58,12 +65,7 @@ export default function TaskFormModal({
             });
       }}
     >
-      <Form
-        form={form}
-        layout="vertical"
-        name="taskForm"
-        initialValues={{ modifier: "public" }}
-      >
+      <Form form={form} layout="vertical" name="taskCreateForm">
         <Form.Item
           name="title"
           label="Name"
@@ -99,9 +101,9 @@ export default function TaskFormModal({
           ]}
         >
           <Radio.Group onChange={handleChange}>
-            <Radio value="todo">To do</Radio>
-            <Radio value="inProgress">In progress</Radio>
-            <Radio value="complete">Complete</Radio>
+            <Radio value={TaskStatusEnum.TODO}>To do</Radio>
+            <Radio value={TaskStatusEnum.IN_PROGRESS}>In progress</Radio>
+            <Radio value={TaskStatusEnum.COMPLETE}>Complete</Radio>
           </Radio.Group>
         </Form.Item>
         <Form.Item name="dueDate" label="Due date">
@@ -125,19 +127,19 @@ export default function TaskFormModal({
               onEdit(values);
             })
             .catch((info) => {
-              console.log("Validate Failed:", info);
+              console.log("Validaion failed:", info);
             });
       }}
     >
       <Form
         form={form}
         layout="vertical"
-        name="taskForm"
+        name="taskEditForm"
         initialValues={initialValues}
       >
         <Form.Item
           name="title"
-          label="Name"
+          label="Task name"
           rules={[
             {
               required: true,
@@ -170,9 +172,9 @@ export default function TaskFormModal({
           ]}
         >
           <Radio.Group onChange={handleChange}>
-            <Radio value="todo">To do</Radio>
-            <Radio value="inProgress">In progress</Radio>
-            <Radio value="complete">Complete</Radio>
+            <Radio value={TaskStatusEnum.TODO}>To do</Radio>
+            <Radio value={TaskStatusEnum.IN_PROGRESS}>In progress</Radio>
+            <Radio value={TaskStatusEnum.COMPLETE}>Complete</Radio>
           </Radio.Group>
         </Form.Item>
         <Form.Item name="dueDate" label="Due date">

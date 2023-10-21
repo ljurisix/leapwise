@@ -1,10 +1,11 @@
-import { UserInterface } from "../users/user.interface";
+import { UserInterface } from "..";
+import { TaskStatusEnum } from "../..";
 
 export interface TaskInterface {
   id?: number;
   title: string;
   description: string;
-  status: string,
+  status: TaskStatusEnum;
   dueDate?: string;
   assigned?: UserInterface;
 }
